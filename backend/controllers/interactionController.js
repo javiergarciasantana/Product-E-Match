@@ -41,8 +41,6 @@ const getUserInteractions = async (req, res) => {
   }
 };
 
-
-
 const getRecommendations = async (req, res) => {
   try {
     const data = await fetchDataForTraining();
