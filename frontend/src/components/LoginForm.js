@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import '../styles/login.css';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -20,26 +21,32 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="login-form">
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Login</button>
-        {error && <p className="error">{error}</p>}
-      </form>
+    <div className="login-container">
+      <div className="login-box">
+        <h1>Welcome Back!</h1>
+        <p>Log in to your account</p>
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit">Login</button>
+          {error && <p className="error">{error}</p>}
+        </form>
+        <p className="register-link">
+          Don't have an account? <a href="/register">Sign up</a>
+        </p>
+      </div>
     </div>
   );
 };

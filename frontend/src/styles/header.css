@@ -1,0 +1,84 @@
+/* Header Styling */
+.header {
+  background: linear-gradient(to right, #141e30, #243b55);
+  padding: 15px 10px;
+  color: #fff;
+  position: fixed; /* Fixes the header to the top */
+  top: 0;
+  left: 0;
+  width: 100%; /* Ensures it spans the width of the screen */
+  z-index: 1000; /* Ensures it stays above other elements */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo Styling */
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #fff;
+  transition: color 0.3s ease;
+}
+
+.logo span {
+  color: #f39c12;
+}
+
+.logo:hover {
+  color: #f39c12;
+}
+
+/* User Actions */
+.user-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.user-actions button {
+  border: none;
+  border-radius: 20px;
+  padding: 8px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+/* Profile Button */
+.profile-btn {
+  background: #4caf50;
+  color: #fff;
+}
+
+.profile-btn:hover {
+  background: #45a049;
+  transform: scale(1.05);
+}
+
+/* Logout Button */
+.logout-btn {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.logout-btn:hover {
+  background: #c0392b;
+  transform: scale(1.05);
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .user-actions {
+    margin-top: 10px;
+  }
+}

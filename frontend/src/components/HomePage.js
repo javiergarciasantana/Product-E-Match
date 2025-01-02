@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Header from './Header';
+import '../styles/home.css';
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
@@ -15,17 +16,19 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div>
+    <div className="home-container">
       <Header />
-      <h2>All Products</h2>
-      <div className="product-list">
-        {products.map((product) => (
-          <div className="product-card" key={product._id}>
-            <h3>{product.name}</h3>
-            <p>Team: {product.team}</p>
-            <p>Price: ${product.price}</p>
-          </div>
-        ))}
+      <div className="products-section">
+        <h2>All Products</h2>
+        <div className="product-list">
+          {products.map((product) => (
+            <div className="product-card" key={product._id}>
+              <h3>{product.name}</h3>
+              <p><strong>Team:</strong> {product.team}</p>
+              <p><strong>Price:</strong> ${product.price}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
