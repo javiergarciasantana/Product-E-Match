@@ -21,6 +21,7 @@ const productSchema = new mongoose.Schema({
     details: { type: String } // Customization details (if any)
   },
   popularity: { type: Number, default: 0 }, // Popularity rank or score
+  image: { type: String } // New field for image URL (or file path)
 });
 
 const Product = mongoose.model('Product', productSchema);

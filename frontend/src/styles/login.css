@@ -1,4 +1,4 @@
-/* Background */
+/* Global Styles */
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
@@ -19,7 +19,7 @@ body {
 
 /* Login Box */
 .login-box {
-  background: #ffffff;
+  background: #fff;
   border-radius: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   padding: 30px;
@@ -27,17 +27,17 @@ body {
   width: 350px;
 }
 
-/* Form Elements */
 .login-box h1 {
-  color: #333333;
+  color: #333;
   margin-bottom: 10px;
 }
 
 .login-box p {
-  color: #666666;
+  color: #666;
   margin-bottom: 20px;
 }
 
+/* Form Elements */
 .login-box input {
   width: 100%;
   padding: 10px;
@@ -45,6 +45,7 @@ body {
   border: 1px solid #ddd;
   border-radius: 5px;
   font-size: 16px;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .login-box input:focus {
@@ -53,16 +54,17 @@ body {
   box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
 }
 
-/* Button */
+/* Button Styles */
 .login-box button {
   width: 100%;
   padding: 10px;
   background-color: #2575fc;
-  color: #ffffff;
+  color: #fff;
   border: none;
   border-radius: 5px;
   font-size: 16px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .login-box button:hover {
@@ -85,6 +87,7 @@ body {
 .register-link a {
   color: #2575fc;
   text-decoration: none;
+  transition: text-decoration 0.3s;
 }
 
 .register-link a:hover {
