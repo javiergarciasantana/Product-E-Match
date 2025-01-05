@@ -1,11 +1,13 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { unique } from '@tensorflow/tfjs';
 
 const userSchema = mongoose.Schema(
   {
-    name: {
+    username: {
       type: String,
       required: true,
+      unique: true,
     },
     email: {
       type: String,

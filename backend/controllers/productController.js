@@ -17,4 +17,36 @@ const addProduct = async (req, res) => {
   res.json(newProduct);
 };
 
-export { getProducts, addProduct };
+// @desc    Search for products based on query
+// @route   GET /api/products/search?query=<search_query>
+// @access  Public
+const searchProducts = async (req, res) => {
+  const { query } = req.query; // Get the search query from the query parameters
+
+  if (!query || query.trim() === "") {
+    return res.status(400).json({ message: "Search query is required." });
+  }
+
+  try {
+    // Use regex to match any product where the query is part of the name or team
+    const products = await Product.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } }, // Case-insensitive match for product name
+        { team: { $regex: query, $options: "i" } }, // Case-insensitive match for team name
+      ],
+    });
+
+    if (products.length === 0) {
+      return res.status(404).json({ message: "No products found matching your query." });
+    }
+
+    res.json(products);
+  } catch (error) {
+    console.error("Error searching for products:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
+export { getProducts, addProduct, searchProducts };

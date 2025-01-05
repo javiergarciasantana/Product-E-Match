@@ -8,14 +8,19 @@ import generateToken from '../utils/generateToken.js';
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    res.status(400);
+    throw new Error('Email and password are required');
+  }
+
   const user = await User.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {
     generateToken(res, user._id);
 
-    res.json({
+    res.status(200).json({
       _id: user._id,
-      name: user.name,
+      username: user.username,
       email: user.email,
     });
   } else {
@@ -23,38 +28,31 @@ const authUser = asyncHandler(async (req, res) => {
     throw new Error('Invalid email or password');
   }
 });
+
 // @desc    Register a new user
 // @route   POST /api/users/register
 // @access  Public
-const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+const registerUser = async (req, res) => {
+  const { username, email, password } = req.body;
 
-  const userExists = await User.findOne({ email });
-
-  if (userExists) {
-    res.status(400);
-    throw new Error('User already exists');
+  if (!username || !email || !password) {
+    return res.status(400).json({ message: 'All fields are required' });
   }
 
-  const user = await User.create({
-    name,
-    email,
-    password,
-  });
-
-  if (user) {
-    generateToken(res, user._id);
-
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-    });
-  } else {
-    res.status(400);
-    throw new Error('Invalid user data');
+  try {
+    const user = new User({ username, email, password });
+    await user.save();
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    if (error.code === 11000) {
+      // Handle duplicate key error
+      const duplicateField = Object.keys(error.keyValue)[0];
+      return res.status(400).json({ message: `${duplicateField} already exists.` });
+    }
+    console.error('Error registering user:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
-});
+};
 
 // @desc    Logout user / clear cookie
 // @route   POST /api/users/logout
@@ -62,6 +60,7 @@ const registerUser = asyncHandler(async (req, res) => {
 const logoutUser = (req, res) => {
   res.cookie('jwt', '', {
     httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // Only send cookies over HTTPS in production
     expires: new Date(0),
   });
   res.status(200).json({ message: 'Logged out successfully' });
@@ -74,9 +73,9 @@ const getUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user) {
-    res.json({
+    res.status(200).json({
       _id: user._id,
-      name: user.name,
+      username: user.username,
       email: user.email,
     });
   } else {
@@ -92,7 +91,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user) {
-    user.name = req.body.name || user.name;
+    user.username = req.body.username || user.username;
     user.email = req.body.email || user.email;
 
     if (req.body.password) {
@@ -101,9 +100,9 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 
     const updatedUser = await user.save();
 
-    res.json({
+    res.status(200).json({
       _id: updatedUser._id,
-      name: updatedUser.name,
+      username: updatedUser.username,
       email: updatedUser.email,
     });
   } else {
@@ -111,6 +110,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     throw new Error('User not found');
   }
 });
+
 export {
   authUser,
   registerUser,

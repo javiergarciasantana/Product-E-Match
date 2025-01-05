@@ -9,7 +9,10 @@ const HomePage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       const response = await axios.get('/api/products/getall');
-      setProducts(response.data);
+      const sortedProducts = response.data.sort((a, b) => 
+        a.name.localeCompare(b.name)
+      );
+      setProducts(sortedProducts);
     };
 
     fetchProducts();

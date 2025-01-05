@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/header.css';
 
 const Header = () => {
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
+    }
+  };
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/');
@@ -16,6 +22,15 @@ const Header = () => {
         <h1 className="logo" onClick={() => navigate('/home')}>
           Product<span>E</span>Match
         </h1>
+        <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Search for jerseys..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button onClick={handleSearch}>🔎</button>
+        </div>
         <div className="user-actions">
           <button className="profile-btn" onClick={() => navigate('/profile')}>
             Profile

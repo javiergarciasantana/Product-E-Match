@@ -24,6 +24,10 @@ const productSchema = new mongoose.Schema({
   image: { type: String } // New field for image URL (or file path)
 });
 
+
+productSchema.index({ name: "text", team: "text", description: "text" });
+
+
 const Product = mongoose.model('Product', productSchema);
 
 export default Product;

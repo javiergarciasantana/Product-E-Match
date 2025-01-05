@@ -1,9 +1,9 @@
-import logo from './logo.svg';
 //import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LoginForm from './components/LoginForm';
 import HomePage from './components/HomePage';
+import LoginForm from './components/LoginForm';
+import SearchResults from './components/SearchResults';
 
 const App = () => {
   return (
@@ -11,6 +11,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/home" element={<HomePage />} />
+        <Route path="/search" element={<SearchResults />} />
       </Routes>
     </Router>
   );
