@@ -8,11 +8,15 @@ const HomePage = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const response = await axios.get('/api/products/getall');
-      const sortedProducts = response.data.sort((a, b) => 
-        a.name.localeCompare(b.name)
-      );
-      setProducts(sortedProducts);
+      try {
+        const response = await axios.get('/api/products/getall');
+        const sortedProducts = response.data.sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        setProducts(sortedProducts);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
     };
 
     fetchProducts();
@@ -32,29 +36,31 @@ const HomePage = () => {
   };
 
   return (
-    <div className="home-container">
+    <div>
       <Header />
-      <div className="products-section">
-        <h2>All Products</h2>
-        <div className="product-list">
-          {products.map((product) => (
-            <div className="product-card" key={product._id}>
-              <img
-                src={product.image || 'default-image.jpg'}
-                alt={product.name}
-                className="product-image"
-              />
-              <h3>{product.name}</h3>
-              <p><strong>Team:</strong> {product.team}</p>
-              <p><strong>Price:</strong> ${product.price}</p>
-              <button
-                className="like-button"
-                onClick={() => handleLike(product._id)}
-              >
-                ❤️ Like
-              </button>
-            </div>
-          ))}
+      <div className="home-container">
+        <div className="products-section">
+          <h2>All Products</h2>
+          <div className="product-list">
+            {products.map((product) => (
+              <div className="product-card" key={product._id}>
+                <img
+                  src={product.image || 'default-image.jpg'}
+                  alt={product.name}
+                  className="product-image"
+                />
+                <h3>{product.name}</h3>
+                <p><strong>Team:</strong> {product.team}</p>
+                <p><strong>Price:</strong> ${product.price}</p>
+                <button
+                  className="like-button"
+                  onClick={() => handleLike(product._id)}
+                >
+                  ❤️ Like
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

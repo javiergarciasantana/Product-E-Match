@@ -2,39 +2,38 @@
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
-  background: linear-gradient(to right, #ece9e6, #ffffff);
+  background: linear-gradient(to right, #6a11cb, #2575fc);
 }
 
+/* Home Container */
 .home-container {
-  margin-top: 60px; /* Same as the height of the header */
+  margin-top: 150px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  box-sizing: border-box;
 }
 
-/* Header Section */
+/* Products Section */
 .products-section h2 {
   text-align: center;
-  color: #ffecec;
-  margin-top: 100px;
+  color: #393636;
   margin-bottom: 20px;
-  padding-top: 20px; /* Add padding to the top of the header */
 }
 
 /* Product List Grid */
-/* Home.css */
 .product-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
   width: 100%;
-  max-height: calc(100vh - 100px); /* Adjust based on header height */
-  overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+  max-width: 1200px;
   padding: 10px;
-}
+  max-height: calc(100vh - 100px);
 
+  box-sizing: border-box;
+}
 
 /* Product Card */
 .product-card {
@@ -44,26 +43,28 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 15px;
   text-align: center;
-  width: 200px; /* Adjust width based on design */
+  width: 100%;
+  max-width: 200px;
   box-sizing: border-box;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
-
 
 .product-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
+/* Product Image */
 .product-image {
   width: 100%;
   height: auto;
-  object-fit: cover; /* Ensure the image covers the space proportionally */
-  max-height: 200px; /* You can adjust this based on your design */
+  object-fit: cover;
+  max-height: 200px;
 }
 
 /* Product Card Content */
 .product-card h3 {
-  font-size: 20px;
+  font-size: 18px;
   color: #2575fc;
   margin-bottom: 10px;
 }
@@ -73,12 +74,14 @@ body {
   margin: 5px 0;
 }
 
+/* Like Button */
 .like-button {
   background-color: transparent;
   border: none;
   color: red;
   font-size: 1.5rem;
   cursor: pointer;
+  transition: opacity 0.2s;
 }
 
 .like-button:hover {
@@ -88,12 +91,16 @@ body {
 /* Responsive Styling */
 @media (max-width: 768px) {
   .product-list {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
 }
 
 @media (max-width: 480px) {
   .product-list {
     grid-template-columns: 1fr;
+  }
+
+  .product-card {
+    max-width: 100%;
   }
 }

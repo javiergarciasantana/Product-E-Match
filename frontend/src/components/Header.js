@@ -11,6 +11,13 @@ const Header = () => {
       navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
     }
   };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/');
@@ -28,8 +35,8 @@ const Header = () => {
           placeholder="Search for jerseys..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
-        <button onClick={handleSearch}>🔎</button>
         </div>
         <div className="user-actions">
           <button className="profile-btn" onClick={() => navigate('/profile')}>

@@ -29,7 +29,8 @@
 
 .search-bar input {
   padding: 8px;
-  width: 200px;
+  height: 20px;
+  width: 300px;
   background: linear-gradient(to right, #5985d7, #6eaef7);
   border: 1px solid #7175ed;
   border-radius: 40px;
