@@ -7,7 +7,7 @@ Welcome to the Product-E-Match Webpage Server repository. This server is respons
 - [Usage](#usage)
 - [Configuration](#configuration)
 - [Contributing](#contributing)
-- [License](#license)
+- [Functionalities](#functionalities)
 
 ## Installation
 
