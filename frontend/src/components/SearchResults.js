@@ -41,6 +41,19 @@ const SearchResults = () => {
     fetchResults();
   }, [query]);
 
+  const handleLike = async (productId) => {
+    try {
+      await axios.post('/api/interactions/log', {
+        productId,
+        interactionType: "like",
+      });
+      alert('Product liked successfully!');
+    } catch (error) {
+      console.error('Error liking product:', error);
+      alert('Failed to like product.');
+    }
+  };
+
   return (
     <div className="search-results">
       <Header />
@@ -64,6 +77,12 @@ const SearchResults = () => {
             <p>
               <strong>Price:</strong> ${product.price}
             </p>
+            <button
+                  className="like-button"
+                  onClick={() => handleLike(product._id)}
+                >
+                  ❤️ Like
+            </button>
           </div>
         ))}
       </div>

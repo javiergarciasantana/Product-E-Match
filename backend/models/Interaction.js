@@ -17,6 +17,14 @@ const interactionSchema = mongoose.Schema(
       enum: ['view', 'like', 'purchase'], // Define the types of interactions
       required: true,
     },
+    team: {
+      type: String, // Name of the team associated with the product
+      required: true,
+    },
+    popularity: {
+      type: Number, // Popularity score of the product
+      required: true,
+    },
     timestamp: {
       type: Date,
       default: Date.now,
