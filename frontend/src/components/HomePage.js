@@ -56,7 +56,7 @@ const HomePage = () => {
         <div className="recommended-section">
           <h2>Recommended for You</h2>
           <div className="product-list">
-            {recommendedProducts.length > 0 ? (
+            {/* {recommendedProducts.length > 0 ? (
               recommendedProducts.map((product) => (
                 <div className="product-card" key={product._id}>
                   <img
@@ -77,8 +77,8 @@ const HomePage = () => {
                 </div>
               ))
             ) : (
+              )} */}
               <p>No recommendations available at the moment.</p>
-            )}
           </div>
         </div>
 
