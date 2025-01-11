@@ -1,4 +1,4 @@
-import { fetchDataForTraining, recommendProducts, trainRecommendationModel } from '../services/recommendationService.js';
+//import { fetchDataForTraining, recommendProducts, trainRecommendationModel } from '../services/recommendationService.js';
 import Interaction from '../models/Interaction.js';
 import Product from '../models/Product.js';
 
@@ -53,24 +53,24 @@ const getUserInteractions = async (req, res) => {
 
 // Generate product recommendations for the authenticated user
 const getRecommendations = async (req, res) => {
-  try {
-    // Fetch interaction data for training
-    const data = await fetchDataForTraining();
-    const model = trainRecommendationModel(data);
+  // try {
+  //   // Fetch interaction data for training
+  //   const data = await fetchDataForTraining();
+  //   const model = trainRecommendationModel(data);
 
-    // Build the product index mapping productId to model indices
-    const productIndex = data.reduce((index, item, idx) => {
-      index[item.productId] = idx;
-      return index;
-    }, {});
+  //   // Build the product index mapping productId to model indices
+  //   const productIndex = data.reduce((index, item, idx) => {
+  //     index[item.productId] = idx;
+  //     return index;
+  //   }, {});
 
-    // Get recommendations for the user
-    const recommendations = await recommendProducts(req.user._id, model, productIndex);
-    res.status(200).json(recommendations);
-  } catch (error) {
-    console.error('Error generating recommendations:', error);
-    res.status(500).json({ message: 'Error generating recommendations', error });
-  }
+  //   // Get recommendations for the user
+  //   const recommendations = await recommendProducts(req.user._id, model, productIndex);
+  //   res.status(200).json(recommendations);
+  // } catch (error) {
+  //   console.error('Error generating recommendations:', error);
+  //   res.status(500).json({ message: 'Error generating recommendations', error });
+  // }
 };
 
 export { logInteraction, getUserInteractions, getRecommendations };
