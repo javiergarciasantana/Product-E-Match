@@ -1,6 +1,7 @@
 //import { fetchDataForTraining, recommendProducts, trainRecommendationModel } from '../services/recommendationService.js';
 import Interaction from '../models/Interaction.js';
 import Product from '../models/Product.js';
+import mongoose from 'mongoose';
 
 // Log a new interaction
 const logInteraction = async (req, res) => {
@@ -73,4 +74,41 @@ const getRecommendations = async (req, res) => {
   // }
 };
 
-export { logInteraction, getUserInteractions, getRecommendations };
+// Eliminar una interacción
+const deleteInteraction = async (req, res) => {
+  try {
+    console.log('Request params ID:', req.params.id); // Log del ID recibido
+
+    // Validar el formato del ID
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      console.log('Invalid interaction ID');
+      return res.status(400).json({ message: 'Invalid interaction ID' });
+    }
+
+    // Buscar la interacción
+    const interaction = await Interaction.findById(req.params.id);
+    console.log('Interaction found:', interaction); // Log de la interacción encontrada
+
+    if (!interaction) {
+      console.log('Interaction not found');
+      return res.status(404).json({ message: 'Interaction not found' });
+    }
+
+    // Verificar que el usuario sea el propietario
+    if (interaction.user.toString() !== req.user._id.toString()) {
+      console.log('User not authorized to delete this interaction');
+      return res.status(403).json({ message: 'Not authorized to delete this interaction' });
+    }
+
+    // Eliminar la interacción usando deleteOne()
+    await interaction.deleteOne();
+    console.log('Interaction deleted successfully');
+    res.status(200).json({ message: 'Interaction deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting interaction:', error); // Log del error
+    res.status(500).json({ message: 'Error deleting interaction', error });
+  }
+};
+
+
+export { logInteraction, getUserInteractions, getRecommendations, deleteInteraction };
