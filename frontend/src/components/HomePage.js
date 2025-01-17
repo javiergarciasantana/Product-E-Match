@@ -8,6 +8,7 @@ const HomePage = () => {
   const [recommendedProducts, setRecommendedProducts] = useState([]);
 
   useEffect(() => {
+    // Función para obtener todos los productos
     const fetchProducts = async () => {
       try {
         const response = await axios.get('/api/products/getall');
@@ -20,6 +21,7 @@ const HomePage = () => {
       }
     };
 
+    // Función para obtener las recomendaciones
     const fetchRecommendations = async () => {
       try {
         const response = await axios.get('/api/interactions/recommendations', {
@@ -38,6 +40,7 @@ const HomePage = () => {
 
   const handleLike = async (productId) => {
     try {
+      // Registrar interacción de "like"
       await axios.post(
         '/api/interactions/log',
         {
@@ -48,13 +51,21 @@ const HomePage = () => {
           withCredentials: true,
         }
       );
-      alert('Product liked successfully!');
+      //alert('Product liked successfully!');
 
+      // Obtener productos actualizados
+      const updatedProducts = await axios.get('/api/products/getall');
+      const sortedProducts = updatedProducts.data.sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
+      setProducts(sortedProducts);
+
+      // Obtener recomendaciones actualizadas
       const updatedRecommendations = await axios.get(
         '/api/interactions/recommendations',
         { withCredentials: true }
       );
-      setRecommendedProducts(updatedRecommendations.data.recommendations || []);
+      setRecommendedProducts(updatedRecommendations.data || []);
     } catch (error) {
       console.error('Error liking product:', error);
       alert('Failed to like product.');
@@ -65,7 +76,7 @@ const HomePage = () => {
     <div>
       <Header />
       <div className="home-container">
-        {/* Recommended Products Section */}
+        {/* Sección de Productos Recomendados */}
         <div className="recommended-section">
           <h2>Recommended for You</h2>
           <div className="product-list">
@@ -80,7 +91,7 @@ const HomePage = () => {
                   />
                   <h3>{product.name}</h3>
                   <p><strong>Team:</strong> {product.team}</p>
-                  {/*<p><strong>Popularity:</strong> {product.popularity}</p>*/}
+                  <p><strong>Popularity:</strong> {product.popularity}</p>
                   <p><strong>Price:</strong> ${product.price}</p>
                   <button
                     className="like-button"
@@ -96,7 +107,7 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* All Products Section */}
+        {/* Sección de Todos los Productos */}
         <div className="products-section">
           <h2>All Products</h2>
           <div className="product-list">
