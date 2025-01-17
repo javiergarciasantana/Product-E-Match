@@ -40,16 +40,15 @@ const registerUser = async (req, res) => {
   }
 
   try {
-    const userExists = await User.findOne({ username });
-
-    if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
     const user = new User({ username, email, password });
     await user.save();
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
+    if (error.code === 11000) {
+      // Handle duplicate key error
+      const duplicateField = Object.keys(error.keyValue)[0];
+      return res.status(400).json({ message: `${duplicateField} already exists.` });
+    }
     console.error('Error registering user:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
