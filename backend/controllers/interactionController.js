@@ -1,7 +1,7 @@
-
 import Interaction from '../models/Interaction.js';
 import Product from '../models/Product.js';
 import mongoose from 'mongoose';
+import suggestRecommendations from '../services/recommendationService.js';
 
 // Log a new interaction
 const logInteraction = async (req, res) => {
@@ -52,8 +52,6 @@ const getUserInteractions = async (req, res) => {
   }
 };
 
-// Generate product recommendations for the authenticated user
-// Generate product recommendations for the authenticated user with a similarity filter
 const getRecommendations = async (req, res) => {
   try {
     console.log('Solicitud recibida para recomendaciones del usuario:', req.user);
@@ -68,39 +66,49 @@ const getRecommendations = async (req, res) => {
       return res.status(404).json({ message: 'No likes found to generate recommendations' });
     }
 
-    // Paso 2: Identificar equipos o categorías comunes en los likes
-    const likedTeams = likedInteractions.map((interaction) => interaction.product.team);
+    // Paso 2: Inicializar una lista para almacenar todas las recomendaciones
+    let allRecommendations = [];
 
-    // Paso 3: Buscar productos similares basados en el equipo
-    const recommendedProducts = await Product.find({
-      team: { $in: likedTeams },
-      _id: { $nin: likedInteractions.map((interaction) => interaction.product._id) }, // Excluir productos ya marcados como "like"
-    });
+    // Iterar sobre los productos "like" y llamar a suggestRecommendations para cada uno
+    for (const interaction of likedInteractions) {
+      const productName = interaction.product.name;
 
-    if (!recommendedProducts.length) {
-      return res.status(404).json({ message: 'No recommendations available' });
+      console.log(`Generating recommendations for liked product: ${productName}`);
+
+      const recommendations = await suggestRecommendations(
+        "http://localhost:3000/api/products/getall",
+        productName
+      );
+
+      // Agregar las recomendaciones obtenidas a la lista
+      allRecommendations = allRecommendations.concat(recommendations);
     }
 
-    // Paso 4: Filtrar recomendaciones con similitud mayor a 4
-    const filteredRecommendations = recommendedProducts
-      .map((product) => {
-        // Calcular una similitud ficticia para este ejemplo
-        const similarity = Math.random() * 10; // Reemplazar con un cálculo real si está disponible
-        return { ...product._doc, similarity };
-      })
-      .filter((product) => product.similarity > 4) // Filtrar por similitud mayor a 4
-      .sort((a, b) => b.similarity - a.similarity); // Ordenar por similitud descendente
+    // Paso 3: Filtrar recomendaciones con similitud mayor a 4
+    const filteredRecommendations = allRecommendations
+    .map((product) => ({
+      name: product.name, // Asegúrate de que estos datos existan en el objeto `product`
+      team: product.team,
+      price: product.price,
+      image: product.image,
+      similarity: product.similarity,
+    }))
+    .sort((a, b) => b.similarity - a.similarity); // Ordenar por similitud descendente
+
 
     if (!filteredRecommendations.length) {
       return res.status(404).json({ message: 'No recommendations match the similarity threshold' });
     }
 
     res.status(200).json(filteredRecommendations);
+    //imprimir recomendaciones proporcionadas
+    console.log('recommendations:', filteredRecommendations);
   } catch (error) {
     console.error('Error generating recommendations:', error);
     res.status(500).json({ message: 'Error generating recommendations', error });
   }
 };
+
 
 // Eliminar una interacción
 const deleteInteraction = async (req, res) => {

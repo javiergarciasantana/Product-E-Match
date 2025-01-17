@@ -43,8 +43,9 @@ function generateRecommendations(data, targetName) {
     // Sort products by similarity in descending order, excluding the target product
     return recommendations
         .filter(item => item.name !== targetName)
+        .filter((product) => product.similarity > 7)
         .sort((a, b) => b.similarity - a.similarity)
-        .slice(0, 5); // Return the top 5 recommendations
+        //.slice(0, 5); // Return the top 5 recommendations
 }
 
 /**
@@ -53,7 +54,7 @@ function generateRecommendations(data, targetName) {
  * @param {string} targetName - The name of the product to find recommendations for.
  * @returns {Array} The recommended products.
  */
-async function getRecommendations(apiUrl, targetName) {
+async function suggestRecommendations(apiUrl, targetName) {
     const data = await fetchData(apiUrl);
 
     if (!Array.isArray(data) || data.length === 0) {
@@ -64,4 +65,4 @@ async function getRecommendations(apiUrl, targetName) {
 }
 
 // Export the main function
-export default getRecommendations;
+export default suggestRecommendations;
