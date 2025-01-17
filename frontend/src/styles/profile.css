@@ -1,7 +1,6 @@
 /* General page layout */
 .profile-container {
-  max-width: 1200px;
-  margin-top: 280px;
+  margin-top: px;
   padding: 20px;
   font-family: Arial, sans-serif;
   color: #333;
@@ -109,18 +108,3 @@
     height: 150px;
   }
 }
-
-.delete-button {
-  background-color: #e74c3c;
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.delete-button:hover {
-  background-color: #c0392b;
-}
-

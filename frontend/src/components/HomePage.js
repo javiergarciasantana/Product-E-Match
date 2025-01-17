@@ -8,7 +8,6 @@ const HomePage = () => {
   const [recommendedProducts, setRecommendedProducts] = useState([]);
 
   useEffect(() => {
-    // Fetch all products
     const fetchProducts = async () => {
       try {
         const response = await axios.get('/api/products/getall');
@@ -21,11 +20,13 @@ const HomePage = () => {
       }
     };
 
-    // Fetch recommended products for the user
     const fetchRecommendations = async () => {
       try {
-        const response = await axios.get('/api/interactions/recommendations');
-        setRecommendedProducts(response.data);
+        const response = await axios.get('/api/interactions/recommendations', {
+          withCredentials: true,
+        });
+        console.log('Data from API:', response.data);
+        setRecommendedProducts(response.data || []);
       } catch (error) {
         console.error("Error fetching recommendations:", error);
       }
@@ -37,11 +38,23 @@ const HomePage = () => {
 
   const handleLike = async (productId) => {
     try {
-      await axios.post('/api/interactions/log', {
-        productId,
-        interactionType: "like",
-      });
+      await axios.post(
+        '/api/interactions/log',
+        {
+          productId,
+          interactionType: "like",
+        },
+        {
+          withCredentials: true,
+        }
+      );
       alert('Product liked successfully!');
+
+      const updatedRecommendations = await axios.get(
+        '/api/interactions/recommendations',
+        { withCredentials: true }
+      );
+      setRecommendedProducts(updatedRecommendations.data.recommendations || []);
     } catch (error) {
       console.error('Error liking product:', error);
       alert('Failed to like product.');
@@ -56,7 +69,8 @@ const HomePage = () => {
         <div className="recommended-section">
           <h2>Recommended for You</h2>
           <div className="product-list">
-            {/* {recommendedProducts.length > 0 ? (
+            {console.log('Rendering recommended products:', recommendedProducts)}
+            {recommendedProducts.length > 0 ? (
               recommendedProducts.map((product) => (
                 <div className="product-card" key={product._id}>
                   <img
@@ -66,7 +80,7 @@ const HomePage = () => {
                   />
                   <h3>{product.name}</h3>
                   <p><strong>Team:</strong> {product.team}</p>
-                  <p><strong>Popularity:</strong> {product.popularity}</p>
+                  {/*<p><strong>Popularity:</strong> {product.popularity}</p>*/}
                   <p><strong>Price:</strong> ${product.price}</p>
                   <button
                     className="like-button"
@@ -77,8 +91,8 @@ const HomePage = () => {
                 </div>
               ))
             ) : (
-              )} */}
               <p>No recommendations available at the moment.</p>
+            )}
           </div>
         </div>
 

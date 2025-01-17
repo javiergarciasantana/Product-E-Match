@@ -54,24 +54,32 @@ const getUserInteractions = async (req, res) => {
 
 // Generate product recommendations for the authenticated user
 const getRecommendations = async (req, res) => {
-  // try {
-  //   // Fetch interaction data for training
-  //   const data = await fetchDataForTraining();
-  //   const model = trainRecommendationModel(data);
+  try {
+    console.log('Solicitud recibida para recomendaciones del usuario:', req.user);
+    // Paso 1: Obtener los productos a los que el usuario ha dado "like"
+    const likedInteractions = await Interaction.find({
+      user: req.user._id,
+      interactionType: 'like',
+    }).populate('product');
 
-  //   // Build the product index mapping productId to model indices
-  //   const productIndex = data.reduce((index, item, idx) => {
-  //     index[item.productId] = idx;
-  //     return index;
-  //   }, {});
+    if (!likedInteractions.length) {
+      return res.status(404).json({ message: 'No likes found to generate recommendations' });
+    }
 
-  //   // Get recommendations for the user
-  //   const recommendations = await recommendProducts(req.user._id, model, productIndex);
-  //   res.status(200).json(recommendations);
-  // } catch (error) {
-  //   console.error('Error generating recommendations:', error);
-  //   res.status(500).json({ message: 'Error generating recommendations', error });
-  // }
+    // Paso 2: Identificar equipos o categorías comunes en los likes
+    const likedTeams = likedInteractions.map((interaction) => interaction.product.team);
+
+    // Paso 3: Buscar productos similares basados en el equipo
+    const recommendedProducts = await Product.find({
+      team: { $in: likedTeams },
+      _id: { $nin: likedInteractions.map((interaction) => interaction.product._id) }, // Excluir productos ya marcados como "like"
+    }).limit(10); // Limitar el número de recomendaciones
+    //console.log('Recommended Products (render):', recommendedProducts);
+    res.status(200).json(recommendedProducts);
+  } catch (error) {
+    console.error('Error generating recommendations:', error);
+    res.status(500).json({ message: 'Error generating recommendations', error });
+  }
 };
 
 // Eliminar una interacción
