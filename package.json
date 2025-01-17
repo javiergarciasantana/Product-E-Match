@@ -10,6 +10,7 @@
     "style-loader": "^4.0.0"
   },
   "dependencies": {
-    "mongoose-unique-validator": "^4.0.1"
+    "mongoose-unique-validator": "^4.0.1",
+    "natural": "^8.0.1"
   }
 }

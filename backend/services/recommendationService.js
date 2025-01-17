@@ -1,185 +1,67 @@
-// import * as tf from '@tensorflow/tfjs';
-// import Interaction from '../models/Interaction.js';
+import fetch from 'node-fetch';
+import natural from 'natural';
 
-// /**
-//  * Trains a recommendation model based on user-product interactions.
-//  * Includes team and popularity as additional features.
-//  * @param {Array} data - Interaction data in the format [{ userId, productId, interactionType, team, popularity }]
-//  * @returns {tf.Model} - Trained TensorFlow.js model.
-//  */
-// export const trainRecommendationModel = (data) => {
-//   // Step 1: Create user and product indices
-//   const userIndex = {};
-//   const productIndex = {};
-//   const teamIndex = {};
+const TfIdf = natural.TfIdf;
 
-//   let userCounter = 0;
-//   let productCounter = 0;
-//   let teamCounter = 0;
+/**
+ * Fetch data from an external API.
+ * @param {string} apiUrl - The URL of the API to fetch data from.
+ * @returns {Array} The fetched data.
+ */
+async function fetchData(apiUrl) {
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data: ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data; // Returns an array of objects
+    } catch (error) {
+        console.error("Error fetching data:", error.message);
+        throw new Error("Failed to fetch data from API");
+    }
+}
 
-//   data.forEach(({ userId, productId, team }) => {
-//     if (!userIndex[userId]) userIndex[userId] = userCounter++;
-//     if (!productIndex[productId]) productIndex[productId] = productCounter++;
-//     if (!teamIndex[team]) teamIndex[team] = teamCounter++;
-//   });
+/**
+ * Generate recommendations based on product names.
+ * @param {Array} data - The input data array.
+ * @param {string} targetName - The name of the product to find recommendations for.
+ * @returns {Array} A list of recommended products.
+ */
+function generateRecommendations(data, targetName) {
+    const tfidf = new TfIdf();
 
-//   const numUsers = userCounter;
-//   const numProducts = productCounter;
-//   const numTeams = teamCounter;
+    // Add all product names to the TF-IDF model
+    data.forEach(item => tfidf.addDocument(item.name));
 
-//   // Step 2: Prepare input and output tensors
-//   const userTensor = tf.tensor1d(
-//     data.map(({ userId }) => userIndex[userId]),
-//     'int32'
-//   );
+    // Compute similarity scores with the target name
+    const recommendations = data.map((item, index) => {
+        const similarity = tfidf.tfidf(targetName, index);
+        return { ...item, similarity };
+    });
 
-//   const productTensor = tf.tensor1d(
-//     data.map(({ productId }) => productIndex[productId]),
-//     'int32'
-//   );
+    // Sort products by similarity in descending order, excluding the target product
+    return recommendations
+        .filter(item => item.name !== targetName)
+        .sort((a, b) => b.similarity - a.similarity)
+        .slice(0, 5); // Return the top 5 recommendations
+}
 
-//   const teamTensor = tf.tensor1d(
-//     data.map(({ team }) => teamIndex[team]),
-//     'int32'
-//   );
+/**
+ * Main function to fetch data and generate recommendations.
+ * @param {string} apiUrl - The URL of the API to fetch data from.
+ * @param {string} targetName - The name of the product to find recommendations for.
+ * @returns {Array} The recommended products.
+ */
+async function getRecommendations(apiUrl, targetName) {
+    const data = await fetchData(apiUrl);
 
-//   const popularityTensor = tf.tensor2d(
-//     data.map(({ popularity }) => [popularity / 100]), // Normalize popularity to 0-1
-//     [data.length, 1]
-//   );
+    if (!Array.isArray(data) || data.length === 0) {
+        throw new Error("API returned invalid data or no data available");
+    }
 
-//   const interactionTensor = tf.tensor1d(
-//     data.map(({ interactionType }) => interactionType),
-//     'float32'
-//   );
+    return generateRecommendations(data, targetName);
+}
 
-//   // Step 3: Define the model
-//   const userInput = tf.input({ shape: [], dtype: 'int32' });
-//   const productInput = tf.input({ shape: [], dtype: 'int32' });
-//   const teamInput = tf.input({ shape: [], dtype: 'int32' });
-//   const popularityInput = tf.input({ shape: [1], dtype: 'float32' });
-
-//   const userEmbedding = tf.layers
-//     .embedding({ inputDim: numUsers, outputDim: 8 }) // 8-dimensional embedding
-//     .apply(userInput);
-
-//   const productEmbedding = tf.layers
-//     .embedding({ inputDim: numProducts, outputDim: 8 }) // 8-dimensional embedding
-//     .apply(productInput);
-
-//   const teamEmbedding = tf.layers
-//     .embedding({ inputDim: numTeams, outputDim: 4 }) // 4-dimensional embedding for teams
-//     .apply(teamInput);
-
-//   const concatenatedFeatures = tf.layers.concatenate().apply([
-//     userEmbedding,
-//     productEmbedding,
-//     teamEmbedding,
-//     popularityInput,
-//   ]);
-
-//   const dense1 = tf.layers
-//     .dense({ units: 16, activation: 'relu' })
-//     .apply(concatenatedFeatures);
-
-//   const output = tf.layers
-//     .dense({ units: 1, activation: 'sigmoid' }) // Final output score
-//     .apply(dense1);
-
-//   const model = tf.model({
-//     inputs: [userInput, productInput, teamInput, popularityInput],
-//     outputs: output,
-//   });
-
-//   // Step 4: Compile the model
-//   model.compile({
-//     optimizer: tf.train.adam(),
-//     loss: 'meanSquaredError',
-//     metrics: ['mae'], // Mean Absolute Error
-//   });
-
-//   // Step 5: Train the model
-//   const batchSize = 32;
-//   const epochs = 10;
-
-//   model.fit(
-//     { 
-//       user: userTensor, 
-//       product: productTensor, 
-//       team: teamTensor, 
-//       popularity: popularityTensor 
-//     },
-//     interactionTensor,
-//     {
-//       batchSize,
-//       epochs,
-//       verbose: 1, // Displays training progress
-//     }
-//   );
-
-//   // Return the trained model
-//   return model;
-// };
-
-// /**
-//  * Fetches interaction data for training.
-//  * Includes team and popularity information for products.
-//  */
-// export const fetchDataForTraining = async () => {
-//   const interactions = await Interaction.find({}).populate('product');
-//   const data = interactions
-//     .filter((interaction) => interaction.product) // Ensure product data is populated
-//     .map((interaction) => ({
-//       userId: interaction.user.toString(),
-//       productId: interaction.product._id.toString(),
-//       interactionType:
-//         interaction.interactionType === 'like'
-//           ? 1
-//           : interaction.interactionType === 'purchase'
-//           ? 2
-//           : 0, // Assign numeric values to interaction types
-//       team: interaction.product.team,
-//       popularity: interaction.product.popularity,
-//     }));
-
-//   return data;
-// };
-
-// /**
-//  * Recommends products based on user ID and the trained model.
-//  * Includes popularity and team in predictions.
-//  */
-// export const recommendProducts = async (userId, model, productIndex, products) => {
-//   const userTensor = tf.tensor1d([userId], 'int32');
-//   const productTensors = tf.tensor1d(
-//     products.map((product) => productIndex[product._id]),
-//     'int32'
-//   );
-//   const teamTensors = tf.tensor1d(
-//     products.map((product) => teamIndex[product.team]),
-//     'int32'
-//   );
-//   const popularityTensor = tf.tensor2d(
-//     products.map((product) => [product.popularity / 100]), // Normalize popularity
-//     [products.length, 1]
-//   );
-
-//   const predictions = model.predict([
-//     userTensor.tile([products.length]),
-//     productTensors,
-//     teamTensors,
-//     popularityTensor,
-//   ]);
-
-//   const predictionScores = predictions.arraySync();
-//   const recommendedProducts = products.map((product, idx) => ({
-//     productId: product._id,
-//     name: product.name,
-//     team: product.team,
-//     popularity: product.popularity,
-//     score: predictionScores[idx],
-//   }));
-
-//   recommendedProducts.sort((a, b) => b.score - a.score);
-//   return recommendedProducts.slice(0, 5); // Top 5 recommendations
-// };
+// Export the main function
+export default getRecommendations;

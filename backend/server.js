@@ -8,6 +8,7 @@ import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import userRoutes from './routes/userRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import interactionRoutes from './routes/interactionRoutes.js';
+import getRecommendations from './services/recommendationService.js';
 
 const port = process.env.PORT || 5050;
 
@@ -24,6 +25,24 @@ app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/interactions', interactionRoutes);
 
+app.post('/api/recommendations', async (req, res) => {
+  const { apiUrl, targetName } = req.body;
+
+  if (!apiUrl || !targetName) {
+      res.status(400).json({ message: 'apiUrl and targetName are required' });
+      return;
+  }
+
+  try {
+      const recommendations = await getRecommendations(apiUrl, targetName);
+      res.status(200).json({ success: true, recommendations });
+  } catch (error) {
+      console.error('Error generating recommendations:', error.message);
+      res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Sirve el frontend en producción
 if (process.env.NODE_ENV === 'production') {
   const __dirname = path.resolve();
   app.use(express.static(path.join(__dirname, '/frontend/dist')));
