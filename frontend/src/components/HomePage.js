@@ -91,7 +91,6 @@ const HomePage = () => {
                   />
                   <h3>{product.name}</h3>
                   <p><strong>Team:</strong> {product.team}</p>
-                  <p><strong>Popularity:</strong> {product.popularity}</p>
                   <p><strong>Price:</strong> ${product.price}</p>
                   <button
                     className="like-button"

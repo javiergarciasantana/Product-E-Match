@@ -78,10 +78,6 @@ const ProfilePage = () => {
                   <p>
                     <strong>Price:</strong> ${product.price}
                   </p>
-                  <p>
-                    <strong>Popularity:</strong>{' '}
-                    <span className="popularity">{product.popularity}</span>
-                  </p>
                   {product.popularity > 80 && (
                     <div className="popular-badge">🔥 Popular</div>
                   )}

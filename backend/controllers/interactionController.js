@@ -1,4 +1,4 @@
-//import { fetchDataForTraining, recommendProducts, trainRecommendationModel } from '../services/recommendationService.js';
+
 import Interaction from '../models/Interaction.js';
 import Product from '../models/Product.js';
 import mongoose from 'mongoose';
@@ -53,9 +53,11 @@ const getUserInteractions = async (req, res) => {
 };
 
 // Generate product recommendations for the authenticated user
+// Generate product recommendations for the authenticated user with a similarity filter
 const getRecommendations = async (req, res) => {
   try {
     console.log('Solicitud recibida para recomendaciones del usuario:', req.user);
+
     // Paso 1: Obtener los productos a los que el usuario ha dado "like"
     const likedInteractions = await Interaction.find({
       user: req.user._id,
@@ -73,9 +75,27 @@ const getRecommendations = async (req, res) => {
     const recommendedProducts = await Product.find({
       team: { $in: likedTeams },
       _id: { $nin: likedInteractions.map((interaction) => interaction.product._id) }, // Excluir productos ya marcados como "like"
-    }).limit(10); // Limitar el número de recomendaciones
-    //console.log('Recommended Products (render):', recommendedProducts);
-    res.status(200).json(recommendedProducts);
+    });
+
+    if (!recommendedProducts.length) {
+      return res.status(404).json({ message: 'No recommendations available' });
+    }
+
+    // Paso 4: Filtrar recomendaciones con similitud mayor a 4
+    const filteredRecommendations = recommendedProducts
+      .map((product) => {
+        // Calcular una similitud ficticia para este ejemplo
+        const similarity = Math.random() * 10; // Reemplazar con un cálculo real si está disponible
+        return { ...product._doc, similarity };
+      })
+      .filter((product) => product.similarity > 4) // Filtrar por similitud mayor a 4
+      .sort((a, b) => b.similarity - a.similarity); // Ordenar por similitud descendente
+
+    if (!filteredRecommendations.length) {
+      return res.status(404).json({ message: 'No recommendations match the similarity threshold' });
+    }
+
+    res.status(200).json(filteredRecommendations);
   } catch (error) {
     console.error('Error generating recommendations:', error);
     res.status(500).json({ message: 'Error generating recommendations', error });
